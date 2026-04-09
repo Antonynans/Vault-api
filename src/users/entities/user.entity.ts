@@ -4,11 +4,12 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  // OneToMany,
+  OneToMany,
   BeforeInsert,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import * as bcrypt from 'bcryptjs';
+import { Account } from '../../accounts/entities/account.entity';
 
 export enum UserRole {
   CUSTOMER = 'customer',
@@ -43,10 +44,18 @@ export class User {
   @Exclude()
   password!: string;
 
-  @Column({ type: 'enum', enum: UserRole, default: UserRole.CUSTOMER })
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.CUSTOMER,
+  })
   role!: UserRole;
 
-  @Column({ type: 'enum', enum: KycStatus, default: KycStatus.PENDING })
+  @Column({
+    type: 'enum',
+    enum: KycStatus,
+    default: KycStatus.PENDING,
+  })
   kycStatus!: KycStatus;
 
   @Column({ default: false })
@@ -62,6 +71,9 @@ export class User {
   @Column({ nullable: true, select: false })
   @Exclude()
   transactionPin!: string;
+
+  @OneToMany(() => Account, (account) => account.user)
+  accounts!: Account[];
 
   @CreateDateColumn()
   createdAt!: Date;
