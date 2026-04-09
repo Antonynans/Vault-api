@@ -20,6 +20,7 @@ import { Account } from './accounts/entities/account.entity';
 import { Transaction } from './transactions/entities/transaction.entity';
 import { Wallet } from './wallets/entities/wallet.entity';
 import { AuditLog } from './audit/entities/audit-log.entity';
+import { HealthModule } from './health/health.module';
 
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
@@ -84,6 +85,7 @@ const ENTITIES = [User, Account, Transaction, Wallet, AuditLog];
     AccountsModule,
     TransactionsModule,
     WalletsModule,
+    HealthModule,
   ],
 
   providers: [
