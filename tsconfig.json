@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    // "ignoreDeprecations": "6.0",
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "resolvePackageJsonExports": true,
@@ -20,6 +21,11 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
-  }
+    "noFallthroughCasesInSwitch": false,
+     "allowJs": true
+  },
+   "include": [
+    "src",
+    "jest.config.js"
+  ]
 }
