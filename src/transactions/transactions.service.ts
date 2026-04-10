@@ -28,6 +28,7 @@ import {
 } from '../events/domain-events';
 import { v4 as uuidv4 } from 'uuid';
 import { FeesService } from '../fees/fees.service';
+import { getErrorMessage, toError } from '../common/utils/error';
 
 export interface PaginatedResult<T> {
   data: T[];
@@ -37,6 +38,11 @@ export interface PaginatedResult<T> {
   totalPages: number;
 }
 
+interface DailyVolumeRow {
+  date: string;
+  volume: string; // SUM returns string in PostgreSQL drivers
+  count: string; // COUNT returns string too
+}
 @Injectable()
 export class TransactionsService {
   constructor(
@@ -64,7 +70,6 @@ export class TransactionsService {
     return { data, total, page, limit, totalPages: Math.ceil(total / limit) };
   }
 
-  // ── Transfer ─────────────────────────────────────────────────────────────────
   async transfer(
     userId: string,
     dto: InitiateTransferDto,
@@ -85,7 +90,7 @@ export class TransactionsService {
       TransactionType.TRANSFER,
       Math.round(dto.amount * 100),
     );
-    const fee = feeCalc.feeInMajor;
+    const fee = Number(feeCalc.feeInMajor);
     const totalDebit = dto.amount + fee;
 
     const qr = this.dataSource.createQueryRunner();
@@ -146,29 +151,29 @@ export class TransactionsService {
     } catch (err) {
       await qr.rollbackTransaction();
       tx.status = TransactionStatus.FAILED;
-      tx.failureReason = err.message;
+      const message = getErrorMessage(err);
+      tx.failureReason = message;
       await this.txRepo.save(tx);
 
       this.auditService.log(AuditAction.TRANSFER_FAILED, {
         userId,
         resourceId: tx.reference,
         resourceType: 'transaction',
-        metadata: { reason: err.message },
+        metadata: { reason: getErrorMessage(err) },
       });
       this.eventEmitter.emit(EVENTS.TRANSFER_FAILED, {
         reference: tx.reference,
         userId,
         amount: dto.amount,
-        reason: err.message,
+        reason: message,
       } satisfies TransferFailedEvent);
 
-      throw err;
+      throw toError(err);
     } finally {
       await qr.release();
     }
   }
 
-  // ── Deposit ───────────────────────────────────────────────────────────────────
   async deposit(dto: DepositDto): Promise<Transaction> {
     const account = await this.accountsService.findOne(dto.accountId);
     const qr = this.dataSource.createQueryRunner();
@@ -211,15 +216,15 @@ export class TransactionsService {
     } catch (err) {
       await qr.rollbackTransaction();
       tx.status = TransactionStatus.FAILED;
-      tx.failureReason = err.message;
+      const message = getErrorMessage(err);
+      tx.failureReason = message;
       await this.txRepo.save(tx);
-      throw err;
+      throw toError(err);
     } finally {
       await qr.release();
     }
   }
 
-  // ── Withdrawal ────────────────────────────────────────────────────────────────
   async withdraw(
     userId: string,
     dto: WithdrawalDto,
@@ -267,15 +272,15 @@ export class TransactionsService {
     } catch (err) {
       await qr.rollbackTransaction();
       tx.status = TransactionStatus.FAILED;
-      tx.failureReason = err.message;
+      const message = getErrorMessage(err);
+      tx.failureReason = message;
       await this.txRepo.save(tx);
-      throw err;
+      throw toError(err);
     } finally {
       await qr.release();
     }
   }
 
-  // ── Queries ───────────────────────────────────────────────────────────────────
   async findByAccount(
     accountId: string,
     userId: string,
@@ -310,19 +315,42 @@ export class TransactionsService {
     return this.paginate(data, total, page, limit);
   }
 
-  // ── Stats helpers (used by AdminService) ─────────────────────────────────────
+  // async getDailyVolume(
+  //   days = 30,
+  // ): Promise<{ date: string; volume: number; count: number }[]> {
+  //   return this.txRepo
+  //     .createQueryBuilder('tx')
+  //     .select('DATE(tx.createdAt) AS date')
+  //     .addSelect('SUM(tx.amount)', 'volume')
+  //     .addSelect('COUNT(*)', 'count')
+  //     .where("tx.status = 'completed'")
+  //     .andWhere("tx.createdAt >= NOW() - INTERVAL ':days days'", { days })
+  //     .groupBy('DATE(tx.createdAt)')
+  //     .orderBy('date', 'ASC')
+  //     .getRawMany();
+  // }
+
+  // Define the shape above the method or in a types file
+
   async getDailyVolume(
     days = 30,
   ): Promise<{ date: string; volume: number; count: number }[]> {
-    return this.txRepo
+    const rows = await this.txRepo
       .createQueryBuilder('tx')
-      .select('DATE(tx.createdAt) AS date')
+      .select('DATE(tx.createdAt)', 'date') // ← also fix: use the 2-arg form
       .addSelect('SUM(tx.amount)', 'volume')
       .addSelect('COUNT(*)', 'count')
       .where("tx.status = 'completed'")
       .andWhere("tx.createdAt >= NOW() - INTERVAL ':days days'", { days })
       .groupBy('DATE(tx.createdAt)')
       .orderBy('date', 'ASC')
-      .getRawMany();
+      .getRawMany<DailyVolumeRow>();
+
+    // Coerce strings → numbers (PostgreSQL returns numeric aggregates as strings)
+    return rows.map((r) => ({
+      date: r.date,
+      volume: Number(r.volume),
+      count: Number(r.count),
+    }));
   }
 }

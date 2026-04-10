@@ -30,51 +30,51 @@ export class Account {
   id!: string;
 
   @Column({ unique: true })
-  accountNumber: string;
+  accountNumber!: string;
 
   @Column({
     type: 'enum',
     enum: AccountType,
     default: AccountType.WALLET,
   })
-  type: AccountType;
+  type!: AccountType;
 
   @Column({
     type: 'enum',
     enum: AccountStatus,
     default: AccountStatus.ACTIVE,
   })
-  status: AccountStatus;
+  status!: AccountStatus;
 
   @Column({
     type: 'enum',
     enum: Currency,
     default: Currency.NGN,
   })
-  currency: Currency;
+  currency!: Currency;
 
   @Column({ type: 'decimal', precision: 18, scale: 2, default: 0 })
-  balance: number;
+  balance!: number;
 
   @Column({ type: 'decimal', precision: 18, scale: 2, default: 0 })
-  ledgerBalance: number; // includes pending transactions
+  ledgerBalance!: number; // includes pending transactions
 
   @ManyToOne(() => User, (user) => user.accounts, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
-  user: User;
+  user!: User;
 
   @Column()
-  userId: string;
+  userId!: string;
 
   @OneToMany(() => Transaction, (tx) => tx.sourceAccount)
-  outgoingTransactions: Transaction[];
+  outgoingTransactions!: Transaction[];
 
   @OneToMany(() => Transaction, (tx) => tx.destinationAccount)
-  incomingTransactions: Transaction[];
+  incomingTransactions!: Transaction[];
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 }

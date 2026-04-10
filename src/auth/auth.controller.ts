@@ -12,6 +12,7 @@ import { ApiTags, ApiOperation, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto, RefreshTokenDto } from './dto/auth.dto';
 import { Public, CurrentUser } from './decorators/public.decorator';
+import { User } from '../users/entities/user.entity';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -31,7 +32,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login with email and password' })
   @ApiBody({ type: LoginDto })
-  login(@Req() req: any) {
+  login(@Req() req: { user: User }) {
     return this.authService.login(req.user);
   }
 
@@ -47,7 +48,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Logout and invalidate refresh token' })
-  logout(@CurrentUser() user: any) {
+  logout(@CurrentUser() user: User) {
     return this.authService.logout(user.id);
   }
 }

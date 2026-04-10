@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuditLog, AuditAction } from './entities/audit-log.entity';
+import { getErrorMessage } from '../common/utils/error';
 
 export interface AuditContext {
   userId?: string;
@@ -25,11 +26,10 @@ export class AuditService {
   /** Fire-and-forget — never throws, never blocks the caller */
   log(action: AuditAction, context: AuditContext = {}): void {
     const entry = this.auditRepo.create({ action, ...context });
-    this.auditRepo
-      .save(entry)
-      .catch((err) =>
-        this.logger.error(`Audit write failed [${action}]: ${err.message}`),
-      );
+    this.auditRepo.save(entry).catch((err) => {
+      const message = getErrorMessage(err);
+      this.logger.error(`Audit write failed [${action}]: ${message}`);
+    });
   }
 
   async findByUser(

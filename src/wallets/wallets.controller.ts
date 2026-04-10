@@ -3,7 +3,6 @@ import { WalletsService } from './wallets.service';
 import { WalletTier } from './entities/wallet.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
-// import { CurrentUser } from '../auth/decorators/public.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/entities/user.entity';
 import { IsEnum } from 'class-validator';
@@ -11,7 +10,7 @@ import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
 class UpgradeTierDto {
   @IsEnum(WalletTier)
-  tier: WalletTier;
+  tier!: WalletTier;
 }
 
 @ApiTags('Wallets')

@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    // "ignoreDeprecations": "6.0",
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "resolvePackageJsonExports": true,
@@ -14,7 +13,7 @@
     "target": "ES2023",
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./",
+    // "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
@@ -22,10 +21,8 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
-     "allowJs": true
+    "allowJs": true,
+    "typeRoots": ["./src/types", "./node_modules/@types"]
   },
-   "include": [
-    "src",
-    "jest.config.js"
-  ]
+  "include": ["src", "jest.config.js"]
 }

@@ -19,17 +19,17 @@ import { UserRole } from '../users/entities/user.entity';
 
 class UpsertFeeConfigDto {
   @IsString()
-  name: string;
+  name!: string;
 
   @IsEnum(TransactionType)
-  transactionType: TransactionType;
+  transactionType!: TransactionType;
 
   @IsEnum(FeeType)
-  feeType: FeeType;
+  feeType!: FeeType;
 
   @IsNumber()
   @Min(0)
-  value: number;
+  value!: number;
 
   @IsNumber()
   @IsOptional()

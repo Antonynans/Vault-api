@@ -33,33 +33,33 @@ export enum AuditAction {
 @Index(['action', 'createdAt'])
 export class AuditLog {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column({ type: 'enum', enum: AuditAction })
-  action: AuditAction;
+  action!: AuditAction;
 
   @Column({ nullable: true })
   @Index()
-  userId: string;
+  userId!: string;
 
   @Column({ nullable: true })
-  resourceId: string;
+  resourceId!: string;
 
   @Column({ nullable: true })
-  resourceType: string;
+  resourceType!: string;
 
   @Column({ nullable: true })
-  ipAddress: string;
+  ipAddress!: string;
 
   @Column({ nullable: true })
-  userAgent: string;
+  userAgent!: string;
 
   @Column({ type: 'jsonb', nullable: true })
-  metadata: Record<string, any>;
+  metadata!: Record<string, any>;
 
   @Column({ default: false })
-  isSuspicious: boolean;
+  isSuspicious!: boolean;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 }
