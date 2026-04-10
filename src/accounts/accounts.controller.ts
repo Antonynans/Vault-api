@@ -15,6 +15,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { CurrentUser } from '../auth/decorators/public.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/entities/user.entity';
+import { Account } from './entities/account.entity';
 
 @ApiTags('Accounts')
 @ApiBearerAuth()
@@ -24,22 +25,22 @@ export class AccountsController {
   constructor(private readonly accountsService: AccountsService) {}
 
   @Post()
-  create(@CurrentUser() user: any, @Body() dto: CreateAccountDto) {
+  create(@CurrentUser() user: Account, @Body() dto: CreateAccountDto) {
     return this.accountsService.create(user.id, dto);
   }
 
   @Get()
-  findMyAccounts(@CurrentUser() user: any) {
+  findMyAccounts(@CurrentUser() user: Account) {
     return this.accountsService.findAllForUser(user.id);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string, @CurrentUser() user: any) {
+  findOne(@Param('id') id: string, @CurrentUser() user: Account) {
     return this.accountsService.findOne(id, user.id);
   }
 
   @Patch(':id/freeze')
-  freeze(@Param('id') id: string, @CurrentUser() user: any) {
+  freeze(@Param('id') id: string, @CurrentUser() user: Account) {
     return this.accountsService.freeze(id, user.id);
   }
 

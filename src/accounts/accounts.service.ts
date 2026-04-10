@@ -5,7 +5,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, QueryRunner } from 'typeorm';
 import {
   Account,
   AccountStatus,
@@ -14,7 +14,7 @@ import {
 } from './entities/account.entity';
 import { CreateAccountDto } from './dto/account.dto';
 // import { v4 as uuidv4 } from 'uuid';
-import { Currency } from 'src/common/enums/currency.enum';
+import { Currency } from '../common/enums/currency.enum';
 
 @Injectable()
 export class AccountsService {
@@ -78,7 +78,7 @@ export class AccountsService {
   async debitAccount(
     accountId: string,
     amount: number,
-    queryRunner: any,
+    queryRunner: QueryRunner,
   ): Promise<void> {
     const account = await queryRunner.manager.findOne(Account, {
       where: { id: accountId },
@@ -98,7 +98,7 @@ export class AccountsService {
   async creditAccount(
     accountId: string,
     amount: number,
-    queryRunner: any,
+    queryRunner: QueryRunner,
   ): Promise<void> {
     const account = await queryRunner.manager.findOne(Account, {
       where: { id: accountId },

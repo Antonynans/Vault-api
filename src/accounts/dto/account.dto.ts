@@ -1,7 +1,7 @@
 import { IsEnum, IsOptional } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { AccountType } from '../entities/account.entity';
-import { Currency } from 'src/common/enums/currency.enum';
+import { Currency } from '../../common/enums/currency.enum';
 
 export class CreateAccountDto {
   @ApiPropertyOptional({ enum: AccountType, default: AccountType.WALLET })
