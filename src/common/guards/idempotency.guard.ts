@@ -1,9 +1,14 @@
 import {
-  Injectable, CanActivate, ExecutionContext, ConflictException, Logger,
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  ConflictException,
+  Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Transaction } from '../../transactions/entities/transaction.entity';
+import { Request } from 'express';
 
 @Injectable()
 export class IdempotencyGuard implements CanActivate {
@@ -15,11 +20,13 @@ export class IdempotencyGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
-    const key: string | undefined = request.headers['idempotency-key'];
+    const request = context.switchToHttp().getRequest<Request>();
+    const rawKey = request.headers['idempotency-key'];
+    const key = Array.isArray(rawKey) ? rawKey[0] : rawKey;
     if (!key) return true;
 
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (!uuidRegex.test(key)) return true;
 
     const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
