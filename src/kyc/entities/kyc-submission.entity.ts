@@ -59,17 +59,17 @@ export class KycSubmission {
   })
   status!: KycSubmissionStatus;
 
-  @Column({ nullable: true })
+  @Column({ type: 'text', nullable: true })
   rejectionReason!: string | null;
 
   @Column({ nullable: true })
   reviewedBy!: string;
 
-  @Column({ nullable: true })
-  reviewedAt!: Date;
+  @Column({ type: 'timestamptz', nullable: true })
+  reviewedAt!: Date | null;
 
   @Column({ type: 'jsonb', nullable: true })
-  verificationData!: Record<string, any>;
+  verificationData!: Record<string, unknown>;
 
   @CreateDateColumn()
   createdAt!: Date;
