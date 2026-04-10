@@ -32,6 +32,8 @@ import {
   CorrelationIdMiddleware,
   RequestLoggerMiddleware,
 } from './common/middleware/request-logger.middleware';
+import { FeesModule } from './fees/fees.module';
+import { KycModule } from './kyc/kyc.module';
 
 const ENTITIES = [User, Account, Transaction, Wallet, AuditLog];
 
@@ -86,6 +88,8 @@ const ENTITIES = [User, Account, Transaction, Wallet, AuditLog];
     TransactionsModule,
     WalletsModule,
     HealthModule,
+    FeesModule,
+    KycModule,
   ],
 
   providers: [
