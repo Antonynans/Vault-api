@@ -32,8 +32,23 @@ import {
   CorrelationIdMiddleware,
   RequestLoggerMiddleware,
 } from './common/middleware/request-logger.middleware';
+import { FeesModule } from './fees/fees.module';
+import { KycModule } from './kyc/kyc.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { KycSubmission } from './kyc/entities/kyc-submission.entity';
+import { FeeConfig } from './fees/entities/fee-config.entity';
+import { Notification } from './notifications/entities/notification.entity';
 
-const ENTITIES = [User, Account, Transaction, Wallet, AuditLog];
+const ENTITIES = [
+  User,
+  Account,
+  Transaction,
+  Wallet,
+  AuditLog,
+  KycSubmission,
+  Notification,
+  FeeConfig,
+];
 
 @Module({
   imports: [
@@ -86,6 +101,9 @@ const ENTITIES = [User, Account, Transaction, Wallet, AuditLog];
     TransactionsModule,
     WalletsModule,
     HealthModule,
+    FeesModule,
+    KycModule,
+    NotificationsModule,
   ],
 
   providers: [
