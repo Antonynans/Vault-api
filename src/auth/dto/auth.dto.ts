@@ -10,15 +10,15 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 export class RegisterDto {
   @ApiProperty({ example: 'ada@example.com' })
   @IsEmail()
-  email: string;
+  email!: string;
 
   @ApiProperty({ example: 'Ada' })
   @IsString()
-  firstName: string;
+  firstName!: string;
 
   @ApiProperty({ example: 'Okonkwo' })
   @IsString()
-  lastName: string;
+  lastName!: string;
 
   @ApiProperty({ example: 'Str0ng!Pass', minLength: 8 })
   @IsString()
@@ -27,7 +27,7 @@ export class RegisterDto {
     message:
       'Password must contain uppercase, lowercase, number and special character',
   })
-  password: string;
+  password!: string;
 
   @ApiPropertyOptional({ example: '+2348012345678' })
   @IsOptional()
@@ -38,21 +38,21 @@ export class RegisterDto {
 export class LoginDto {
   @ApiProperty({ example: 'ada@example.com' })
   @IsEmail()
-  email: string;
+  email!: string;
 
   @ApiProperty({ example: 'Str0ng!Pass' })
   @IsString()
-  password: string;
+  password!: string;
 }
 
 export class RefreshTokenDto {
   @ApiProperty()
   @IsString()
-  refreshToken: string;
+  refreshToken!: string;
 
   @ApiProperty({
     description: 'User ID — required to look up hashed refresh token',
   })
   @IsString()
-  userId: string;
+  userId!: string;
 }

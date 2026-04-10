@@ -9,6 +9,7 @@ import { UsersService } from '../users/users.service';
 import { RegisterDto } from './dto/auth.dto';
 import { JwtPayload } from './strategies/jwt.strategy';
 import * as bcrypt from 'bcryptjs';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -46,7 +47,7 @@ export class AuthService {
     return { user, ...tokens };
   }
 
-  async login(user: any) {
+  async login(user: User) {
     const tokens = await this.generateTokens(user.id, user.email, user.role);
     await this.usersService.updateRefreshToken(user.id, tokens.refreshToken);
 

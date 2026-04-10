@@ -17,74 +17,74 @@ export const EVENTS = {
 } as const;
 
 export class UserRegisteredEvent {
-  userId: string;
-  email: string;
-  firstName: string;
+  userId!: string;
+  email!: string;
+  firstName!: string;
 }
 
 export class UserLoginEvent {
-  userId: string;
-  email: string;
-  ipAddress: string;
+  userId!: string;
+  email!: string;
+  ipAddress!: string;
 }
 
 export class TransferCompletedEvent {
-  transactionId: string;
-  reference: string;
-  senderId: string;
-  senderAccountId: string;
-  receiverAccountId: string;
-  amount: number;
-  fee: number;
-  currency: string;
+  transactionId!: string;
+  reference!: string;
+  senderId!: string;
+  senderAccountId!: string;
+  receiverAccountId!: string;
+  amount!: number;
+  fee!: number;
+  currency!: string;
 }
 
 export class TransferFailedEvent {
-  reference: string;
-  userId: string;
-  amount: number;
-  reason: string;
+  reference!: string;
+  userId!: string;
+  amount!: number;
+  reason!: string;
 }
 
 export class DepositCompletedEvent {
-  transactionId: string;
-  reference: string;
-  accountId: string;
-  userId: string;
-  amount: number;
-  currency: string;
+  transactionId!: string;
+  reference!: string;
+  accountId!: string;
+  userId!: string;
+  amount!: number;
+  currency!: string;
 }
 
 export class WithdrawalCompletedEvent {
-  transactionId: string;
-  reference: string;
-  accountId: string;
-  userId: string;
-  amount: number;
-  currency: string;
+  transactionId!: string;
+  reference!: string;
+  accountId!: string;
+  userId!: string;
+  amount!: number;
+  currency!: string;
 }
 
 export class KycSubmittedEvent {
-  submissionId: string;
-  userId: string;
-  documentType: string;
+  submissionId!: string;
+  userId!: string;
+  documentType!: string;
 }
 
 export class KycApprovedEvent {
-  submissionId: string;
-  userId: string;
+  submissionId!: string;
+  userId!: string;
 }
 
 export class KycRejectedEvent {
-  submissionId: string;
-  userId: string;
-  reason: string;
+  submissionId!: string;
+  userId!: string;
+  reason!: string;
 }
 
 export class WalletLimitBreachedEvent {
-  userId: string;
-  accountId: string;
-  attemptedAmount: number;
-  limit: number;
-  limitType: 'single' | 'daily' | 'monthly';
+  userId!: string;
+  accountId!: string;
+  attemptedAmount!: number;
+  limit!: number;
+  limitType!: 'single' | 'daily' | 'monthly';
 }

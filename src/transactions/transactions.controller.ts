@@ -15,6 +15,7 @@ import {
   ApiHeader,
   ApiQuery,
 } from '@nestjs/swagger';
+import type { Request } from 'express';
 import { TransactionsService } from './transactions.service';
 import {
   InitiateTransferDto,
@@ -27,6 +28,7 @@ import { IdempotencyGuard } from '../common/guards/idempotency.guard';
 import { CurrentUser } from '../auth/decorators/public.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/entities/user.entity';
+import type { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 import {
   FinancialEndpoint,
   ReadEndpoint,
@@ -49,8 +51,8 @@ export class TransactionsController {
     required: false,
   })
   transfer(
-    @CurrentUser() user: any,
-    @Req() req: any,
+    @CurrentUser() user: JwtPayload,
+    @Req() req: Request,
     @Body() dto: InitiateTransferDto,
   ) {
     return this.transactionsService.transfer(user.id, dto, req.idempotencyKey);
@@ -76,8 +78,8 @@ export class TransactionsController {
     required: false,
   })
   withdraw(
-    @CurrentUser() user: any,
-    @Req() req: any,
+    @CurrentUser() user: JwtPayload,
+    @Req() req: Request,
     @Body() dto: WithdrawalDto,
   ) {
     return this.transactionsService.withdraw(user.id, dto, req.idempotencyKey);
@@ -90,7 +92,7 @@ export class TransactionsController {
   @ApiQuery({ name: 'limit', required: false, type: Number })
   getByAccount(
     @Param('accountId') accountId: string,
-    @CurrentUser() user: any,
+    @CurrentUser() user: JwtPayload,
     @Query('page') page = 1,
     @Query('limit') limit = 20,
   ) {

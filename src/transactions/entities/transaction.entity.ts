@@ -29,66 +29,74 @@ export enum TransactionStatus {
 @Entity('transactions')
 export class Transaction {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column({ unique: true })
-  reference: string; // e.g. TXN-20240101-XXXXXXXX
+  reference!: string; // e.g. TXN-20240101-XXXXXXXX
 
   @Column({
     type: 'enum',
     enum: TransactionType,
   })
-  type: TransactionType;
+  type!: TransactionType;
 
   @Column({
     type: 'enum',
     enum: TransactionStatus,
     default: TransactionStatus.PENDING,
   })
-  status: TransactionStatus;
+  status!: TransactionStatus;
 
   @Column({ type: 'decimal', precision: 18, scale: 2 })
-  amount: number;
+  amount!: number;
 
   @Column({ type: 'decimal', precision: 18, scale: 2, default: 0 })
-  fee: number;
+  fee!: number;
 
   @Column({ type: 'enum', enum: Currency })
-  currency: Currency;
+  currency!: Currency;
 
   @Column({ nullable: true })
-  description: string;
+  description!: string;
 
   @Column({ nullable: true })
-  metadata: string; // JSON string for extra data
+  metadata!: string;
 
-  @ManyToOne(() => Account, (account) => account.outgoingTransactions, {
-    nullable: true,
-  })
+  @ManyToOne(
+    () => Account,
+    (account: Account): Transaction[] => account.outgoingTransactions,
+    {
+      nullable: true,
+    },
+  )
   @JoinColumn({ name: 'sourceAccountId' })
-  sourceAccount: Account;
+  sourceAccount!: Account | null;
 
   @Column({ nullable: true })
-  sourceAccountId: string;
+  sourceAccountId!: string | null;
 
-  @ManyToOne(() => Account, (account) => account.incomingTransactions, {
-    nullable: true,
-  })
+  @ManyToOne(
+    () => Account,
+    (account: Account): Transaction[] => account.incomingTransactions,
+    {
+      nullable: true,
+    },
+  )
   @JoinColumn({ name: 'destinationAccountId' })
-  destinationAccount: Account;
+  destinationAccount!: Account | null;
 
   @Column({ nullable: true })
-  destinationAccountId: string;
+  destinationAccountId!: string | null;
 
   @Column({ nullable: true })
-  reversalOf: string; // reference of the reversed transaction
+  reversalOf!: string; // reference of the reversed transaction
 
   @Column({ nullable: true })
-  failureReason: string;
+  failureReason!: string;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 }
