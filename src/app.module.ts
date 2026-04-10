@@ -38,6 +38,8 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { KycSubmission } from './kyc/entities/kyc-submission.entity';
 import { FeeConfig } from './fees/entities/fee-config.entity';
 import { Notification } from './notifications/entities/notification.entity';
+import { Beneficiary } from './beneficiaries/entities/beneficiary.entity';
+import { BeneficiariesModule } from './beneficiaries/beneficiaries.module';
 
 const ENTITIES = [
   User,
@@ -48,6 +50,7 @@ const ENTITIES = [
   KycSubmission,
   Notification,
   FeeConfig,
+  Beneficiary,
 ];
 
 @Module({
@@ -104,6 +107,7 @@ const ENTITIES = [
     FeesModule,
     KycModule,
     NotificationsModule,
+    BeneficiariesModule,
   ],
 
   providers: [
