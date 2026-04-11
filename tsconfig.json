@@ -25,5 +25,5 @@
     "types": ["jest"],
     "typeRoots": ["./src/types", "./node_modules/@types"]
   },
-  "include": ["src", "test/**/*", "jest.config.js"]
+  "include": ["src", "test/**/*", "jest.config.js", "database"]
 }
