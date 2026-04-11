@@ -17,6 +17,8 @@ export interface AuditContext {
 @Injectable()
 export class AuditService {
   private readonly logger = new Logger(AuditService.name);
+  private readonly MAX_RETRIES = 3;
+  private readonly RETRY_DELAY_MS = 100;
 
   constructor(
     @InjectRepository(AuditLog)
@@ -26,9 +28,26 @@ export class AuditService {
   /** Fire-and-forget — never throws, never blocks the caller */
   log(action: AuditAction, context: AuditContext = {}): void {
     const entry = this.auditRepo.create({ action, ...context });
+    this.saveWithRetry(entry, action, 0);
+  }
+
+  private saveWithRetry(
+    entry: AuditLog,
+    action: AuditAction,
+    attempt: number,
+  ): void {
     this.auditRepo.save(entry).catch((err) => {
-      const message = getErrorMessage(err);
-      this.logger.error(`Audit write failed [${action}]: ${message}`);
+      if (attempt < this.MAX_RETRIES) {
+        setTimeout(
+          () => this.saveWithRetry(entry, action, attempt + 1),
+          this.RETRY_DELAY_MS * Math.pow(2, attempt),
+        );
+      } else {
+        const message = getErrorMessage(err);
+        this.logger.warn(
+          `Audit write failed after ${this.MAX_RETRIES} attempts [${action}]: ${message}`,
+        );
+      }
     });
   }
 

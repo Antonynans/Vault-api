@@ -2,7 +2,10 @@ module.exports = {
   moduleFileExtensions: ['js', 'json', 'ts'],
   rootDir: '.',
   testEnvironment: 'node',
-  transform: { '^.+\\.(t|j)s$': 'ts-jest' },
+  transform: {
+    '^.+\\.(t|j)s$': ['ts-jest', { useESM: true }],
+  },
+  transformIgnorePatterns: ['node_modules/(?!(uuid)/)'],
   collectCoverageFrom: [
     'src/**/*.(t|j)s',
     '!src/main.ts',
@@ -13,19 +16,25 @@ module.exports = {
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
-  coverageThresholds: {
+  coverageThreshold: {
     global: { branches: 60, functions: 70, lines: 70, statements: 70 },
   },
   projects: [
     {
       displayName: 'unit',
       testMatch: ['<rootDir>/test/unit/**/*.spec.ts'],
-      transform: { '^.+\\.(t|j)s$': 'ts-jest' },
+      transform: {
+        '^.+\\.(t|j)s$': ['ts-jest', { useESM: true }],
+      },
+      transformIgnorePatterns: ['node_modules/(?!(uuid)/)'],
     },
     {
       displayName: 'e2e',
       testMatch: ['<rootDir>/test/e2e/**/*.spec.ts'],
-      transform: { '^.+\\.(t|j)s$': 'ts-jest' },
+      transform: {
+        '^.+\\.(t|j)s$': ['ts-jest', { useESM: true }],
+      },
+      transformIgnorePatterns: ['node_modules/(?!(uuid)/)'],
     },
   ],
 };

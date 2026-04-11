@@ -78,3 +78,5 @@ export class Account {
   @UpdateDateColumn()
   updatedAt!: Date;
 }
+
+export { Currency };
