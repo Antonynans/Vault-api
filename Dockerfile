@@ -37,4 +37,4 @@ EXPOSE 3000
 
 # dumb-init properly handles SIGTERM for graceful shutdown
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["node", "dist/main"]
+CMD ["node", "dist/main.js"]
