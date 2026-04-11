@@ -15,6 +15,7 @@ import {
 import { CreateAccountDto } from './dto/account.dto';
 // import { v4 as uuidv4 } from 'uuid';
 import { Currency } from '../common/enums/currency.enum';
+import { randomInt } from 'crypto';
 
 @Injectable()
 export class AccountsService {
@@ -26,7 +27,7 @@ export class AccountsService {
 
   private generateAccountNumber(): string {
     // 10-digit account number — similar to NUBAN format
-    return Math.floor(1000000000 + Math.random() * 9000000000).toString();
+    return randomInt(0, 10_000_000_000).toString().padStart(10, '0');
   }
 
   async create(userId: string, dto: CreateAccountDto): Promise<Account> {
