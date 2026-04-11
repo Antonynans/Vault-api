@@ -15,7 +15,7 @@ async function bootstrap() {
   const port = configService.get<number>('port') ?? 3000;
   const isDev = configService.get<string>('nodeEnv') === 'development';
 
-  app.use(helmet({ contentSecurityPolicy: isDev ? false : undefined }));
+  app.use(helmet());
   app.enableCors({
     origin: isDev
       ? '*'
