@@ -1,99 +1,147 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Vault API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Production-grade NestJS/TypeScript backend. Covers authentication, multi-currency accounts, atomic transactions, KYC, wallet tiers, event-driven notifications, audit logs, admin dashboard, and scheduled maintenance.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## Tech stack
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+| Layer        | Technology                                           |
+|--------------|------------------------------------------------------|
+| Framework    | NestJS 10 + TypeScript                               |
+| Database     | PostgreSQL 16 + TypeORM                              |
+| Auth         | JWT (access + refresh tokens), Passport, bcrypt      |
+| Validation   | class-validator + class-transformer                  |
+| Events       | @nestjs/event-emitter                                |
+| Scheduling   | @nestjs/schedule (cron jobs)                         |
+| Rate limiting| @nestjs/throttler                                    |
+| Docs         | Swagger / OpenAPI 3 at /api/docs                     |
+| Health       | @nestjs/terminus                                     |
+| Container    | Docker multi-stage + Docker Compose                  |
 
-## Project setup
+---
 
+## Quick start
+
+### Docker (zero setup)
 ```bash
-$ yarn install
+docker compose up --build
+# API    → http://localhost:3000/api
+# Docs   → http://localhost:3000/api/docs
+# Health → http://localhost:3000/api/health/ping
 ```
 
-## Compile and run the project
-
+### Local
 ```bash
-# development
-$ yarn run start
-
-# watch mode
-$ yarn run start:dev
-
-# production mode
-$ yarn run start:prod
+npm install
+cp .env.example .env      # fill in secrets
+docker compose up postgres -d
+npm run start:dev
 ```
 
-## Run tests
+---
 
-```bash
-# unit tests
-$ yarn run test
+## Architecture
 
-# e2e tests
-$ yarn run test:e2e
-
-# test coverage
-$ yarn run test:cov
+```
+src/
+├── auth/            JWT, Passport strategies, JwtAuthGuard, RolesGuard
+├── users/           User entity, profile, admin management
+├── accounts/        Multi-currency accounts (NGN/USD/GBP/EUR)
+├── transactions/    Atomic transfers/deposits/withdrawals (QueryRunner)
+├── wallets/         Tier-based spend limits in minor units (kobo)
+├── kyc/             KYC state machine + auto wallet upgrade on approval
+├── notifications/   In-app notifications via EventEmitter listeners
+├── audit/           Global fire-and-forget immutable audit log
+├── admin/           Dashboard stats + scheduled maintenance cron jobs
+├── events/          Strongly-typed domain event payload contracts
+├── health/          DB + memory + disk health probes
+└── common/
+    ├── filters/     Global exception filter (uniform error shape)
+    ├── interceptors/ Response transform + HTTP request logging
+    ├── guards/      Idempotency guard (prevents duplicate transactions)
+    └── pipes/       Pagination pipe
+database/
+├── data-source.ts   TypeORM CLI datasource
+└── migrations/      Versioned schema migrations with indexes
 ```
 
-## Deployment
+---
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## Key design decisions
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+**Atomic money movement** — Every financial operation uses a `QueryRunner` to wrap balance changes and transaction records in one PostgreSQL transaction. Failures roll back entirely; the failed record is persisted for audit.
+
+**Event-driven notifications** — Services emit typed domain events (`EVENTS.TRANSFER_COMPLETED`, etc.) via `EventEmitter2`. `NotificationsService` subscribes with `@OnEvent()` decorators — zero coupling between modules.
+
+**Idempotency** — Send `Idempotency-Key: <uuid>` on transfers/withdrawals. The guard rejects duplicate keys used within 24 hours with `409 Conflict` + original transaction details.
+
+**Wallet limits in minor units** — All comparisons use integer kobo/cents (`bigint`) — no floating-point precision bugs.
+
+**Secure by default** — `JwtAuthGuard` is a global `APP_GUARD`. Routes explicitly opt out with `@Public()` rather than opting in.
+
+**Fire-and-forget audit** — `AuditService.log()` is async and internally swallows errors so audit write failures never surface to consumers.
+
+---
+
+## API overview
+
+Base path: `/api` — full docs at `/api/docs`
+
+| Tag           | Key endpoints                                                      |
+|---------------|--------------------------------------------------------------------|
+| Auth          | POST /auth/register, /auth/login, /auth/refresh, /auth/logout      |
+| Users         | GET /users/me, GET /users (Admin), PATCH /users/:id/deactivate     |
+| Accounts      | POST /accounts, GET /accounts, PATCH /accounts/:id/freeze          |
+| Transactions  | POST /transactions/transfer, /deposit, /withdraw; GET history      |
+| Wallets       | GET /wallets/account/:id/limits, PATCH upgrade (Admin)             |
+| KYC           | POST /kyc/submit, GET /kyc/me, PATCH /kyc/:id/review (Admin)       |
+| Notifications | GET /notifications, PATCH read/read-all, GET unread-count          |
+| Admin         | GET /admin/stats, /admin/user-growth                               |
+| Health        | GET /health, /health/ping                                          |
+
+---
+
+## Migrations
 
 ```bash
-$ yarn install -g @nestjs/mau
-$ mau deploy
+npm run migration:generate   # generate after entity changes
+npm run migration:run        # apply pending
+npm run migration:revert     # rollback last
+npm run migration:show       # list status
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Resources
+## Testing
 
-Check out a few resources that may come in handy when working with NestJS:
+```bash
+npm run test:unit   # unit tests (auth + transaction money logic)
+npm run test:cov    # coverage report
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+---
 
-## Support
+## Wallet tiers
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+| Tier     | KYC required | Single tx  | Monthly      |
+|----------|-------------|------------|--------------|
+| Basic    | No          | ₦50,000    | ₦500,000     |
+| Standard | Soft KYC    | ₦200,000   | ₦2,000,000   |
+| Premium  | Full KYC    | ₦2,000,000 | ₦20,000,000  |
 
-## Stay in touch
+---
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Scheduled jobs
 
-## License
+| When             | Job                                                      |
+|------------------|----------------------------------------------------------|
+| Every hour       | Expire PENDING transactions stuck > 30 min → FAILED      |
+| Daily 02:00      | Purge read notifications older than 90 days              |
+| Weekly Sunday    | Purge audit logs older than 1 year                       |
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
-# Vault-api
+---
+
+## Security
+
+Helmet · CORS per-env · JWT 15m access / 7d refresh (hashed) · bcrypt 12 rounds · `whitelist: true` validation · global rate limiting · idempotency guard · RBAC on all sensitive routes · non-root Docker user · `@Exclude()` on password/refreshToken · SSL for Postgres in production
