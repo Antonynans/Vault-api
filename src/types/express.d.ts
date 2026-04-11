@@ -4,7 +4,8 @@ declare global {
   namespace Express {
     interface Request {
       user?: JwtPayload;
-      idempotencyKey?: string; // set by IdempotencyGuard
+      idempotencyKey?: string;
+      rawBody?: Buffer;
     }
   }
 }

@@ -43,6 +43,7 @@ import { BeneficiariesModule } from './beneficiaries/beneficiaries.module';
 import { TransactionPinModule } from './transaction-pin/transaction-pin.module';
 import { AdminModule } from './admin/admin.module';
 import { StatementsModule } from './statements/statements.module';
+import { WebhooksModule } from './webhooks/webhooks.module';
 
 const ENTITIES = [
   User,
@@ -114,6 +115,7 @@ const ENTITIES = [
     TransactionPinModule,
     AdminModule,
     StatementsModule,
+    WebhooksModule,
   ],
 
   providers: [

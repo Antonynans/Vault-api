@@ -181,7 +181,7 @@ export class TransactionsService {
     await qr.startTransaction();
 
     const tx = this.txRepo.create({
-      reference: this.generateReference(),
+      reference: dto.reference ?? this.generateReference(),
       type: TransactionType.DEPOSIT,
       status: TransactionStatus.PENDING,
       amount: dto.amount,
@@ -304,6 +304,12 @@ export class TransactionsService {
     const tx = await this.txRepo.findOne({ where: { reference } });
     if (!tx) throw new NotFoundException('Transaction not found');
     return tx;
+  }
+
+  async findPendingByReference(reference: string): Promise<Transaction | null> {
+    return this.txRepo.findOne({
+      where: { reference, status: TransactionStatus.PENDING },
+    });
   }
 
   async findAll(page = 1, limit = 50): Promise<PaginatedResult<Transaction>> {

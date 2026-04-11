@@ -55,6 +55,11 @@ export class DepositDto {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @ApiPropertyOptional({ example: 'paystack_ref_123' })
+  @IsString()
+  @IsOptional()
+  reference?: string;
 }
 
 export class WithdrawalDto {
