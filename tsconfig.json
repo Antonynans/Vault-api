@@ -22,7 +22,8 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
     "allowJs": true,
+    "types": ["jest"],
     "typeRoots": ["./src/types", "./node_modules/@types"]
   },
-  "include": ["src", "jest.config.js"]
+  "include": ["src", "test/**/*", "jest.config.js"]
 }
