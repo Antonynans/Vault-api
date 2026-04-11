@@ -76,7 +76,7 @@ async function bootstrap() {
     console.log(`📖  Swagger docs  → http://localhost:${port}/api/docs`);
   }
 
-  await app.listen(port);
+  await app.listen(process.env.PORT || 3000, '0.0.0.0');
   console.log(`\n🚀  vault API   → http://localhost:${port}/api`);
   console.log(`📦  Environment   → ${configService.get('nodeEnv')}\n`);
 }
