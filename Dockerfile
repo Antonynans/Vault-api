@@ -6,6 +6,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --frozen-lockfile
 
+COPY nest-cli.json ./ 
 COPY tsconfig*.json ./
 COPY src ./src
 COPY database ./database
@@ -27,7 +28,7 @@ USER nestjs
 WORKDIR /app
 
 COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=nestjs:nodejs /app/dist         ./dist
+COPY --from=builder --chown=nestjs:nodejs /dist         ./dist
 COPY --from=builder --chown=nestjs:nodejs /app/package.json ./
 
 ENV NODE_ENV=production
