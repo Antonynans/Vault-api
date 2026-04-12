@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
+    "ignoreDeprecations": "6.0",
     "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "isolatedModules": true,
+    "isolatedModules": false,
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
@@ -19,7 +20,7 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
-    "allowJs": true,
+    "allowJs": false,
     "types": ["jest"],
     "typeRoots": ["./src/types", "./node_modules/@types"]
   },
