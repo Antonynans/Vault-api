@@ -12,6 +12,7 @@ COPY src ./src
 COPY database ./database
 
 RUN npm run build
+RUN npm run build && find / -name "main.js" 2>/dev/null
 
 # Prune dev dependencies
 RUN npm prune --production
