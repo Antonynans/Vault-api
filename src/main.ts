@@ -12,13 +12,13 @@ async function bootstrap() {
   });
 
   const configService = app.get(ConfigService);
-  const port = configService.get<number>('port') ?? 3000;
+  const port = configService.get<number>('port') ?? 4000;
   const isDev = configService.get<string>('nodeEnv') === 'development';
 
   app.use(helmet());
   app.enableCors({
     origin: isDev
-      ? '*'
+      ? (process.env.DEV_ORIGIN ?? 'http://localhost:3000')
       : (configService.get<string>('ALLOWED_ORIGINS') ?? '').split(','),
     methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
     allowedHeaders: [
@@ -28,6 +28,7 @@ async function bootstrap() {
       'X-Correlation-ID',
     ],
     exposedHeaders: ['X-Correlation-ID'],
+    credentials: true,
   });
 
   app.setGlobalPrefix('api');

@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from './entities/user.entity';
+import { User, UserRole } from './entities/user.entity';
 import { RegisterDto } from '../auth/dto/auth.dto';
 import * as bcrypt from 'bcryptjs';
 
@@ -39,6 +39,7 @@ export class UsersService {
         'lastName',
         'role',
         'kycStatus',
+        'isActive',
         'createdAt',
       ],
     });
@@ -49,5 +50,16 @@ export class UsersService {
     if (!user) throw new NotFoundException('User not found');
     user.isActive = false;
     return this.userRepo.save(user);
+  }
+
+  async activate(id: string): Promise<User> {
+    const user = await this.findById(id);
+    if (!user) throw new NotFoundException('User not found');
+    user.isActive = true;
+    return this.userRepo.save(user);
+  }
+
+  async updateRole(id: string, role: UserRole) {
+    await this.userRepo.update(id, { role });
   }
 }
