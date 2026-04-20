@@ -5,6 +5,7 @@ Production-grade NestJS/TypeScript backend. Covers authentication, multi-currenc
 ---
 [![Live Demo](https://img.shields.io/badge/Live-Demo-green?style=for-the-badge&logo=vercel)](https://vault-app1.netlify.app)
 [![API Docs](https://img.shields.io/badge/API-Swagger-blue?style=for-the-badge&logo=swagger)](https://vault-api-sbav.onrender.com/api/docs)
+[![Frontend Repo](https://img.shields.io/badge/Frontend-Live-green?style=for-the-badge&logo=vercel)](https://github.com/Antonynans/Vault-frontend)
 ---
 
 ## Tech stack
