@@ -3,6 +3,9 @@
 Production-grade NestJS/TypeScript backend. Covers authentication, multi-currency accounts, atomic transactions, KYC, wallet tiers, event-driven notifications, audit logs, admin dashboard, and scheduled maintenance.
 
 ---
+[![Live Demo](https://img.shields.io/badge/Live-Demo-green?style=for-the-badge&logo=vercel)](https://vault-app1.netlify.app)
+[![API Docs](https://img.shields.io/badge/API-Swagger-blue?style=for-the-badge&logo=swagger)](https://vault-api-sbav.onrender.com/api/docs)
+---
 
 ## Tech stack
 
@@ -39,32 +42,6 @@ docker compose up postgres -d
 npm run start:dev
 ```
 
----
-
-## Architecture
-
-```
-src/
-├── auth/            JWT, Passport strategies, JwtAuthGuard, RolesGuard
-├── users/           User entity, profile, admin management
-├── accounts/        Multi-currency accounts (NGN/USD/GBP/EUR)
-├── transactions/    Atomic transfers/deposits/withdrawals (QueryRunner)
-├── wallets/         Tier-based spend limits in minor units (kobo)
-├── kyc/             KYC state machine + auto wallet upgrade on approval
-├── notifications/   In-app notifications via EventEmitter listeners
-├── audit/           Global fire-and-forget immutable audit log
-├── admin/           Dashboard stats + scheduled maintenance cron jobs
-├── events/          Strongly-typed domain event payload contracts
-├── health/          DB + memory + disk health probes
-└── common/
-    ├── filters/     Global exception filter (uniform error shape)
-    ├── interceptors/ Response transform + HTTP request logging
-    ├── guards/      Idempotency guard (prevents duplicate transactions)
-    └── pipes/       Pagination pipe
-database/
-├── data-source.ts   TypeORM CLI datasource
-└── migrations/      Versioned schema migrations with indexes
-```
 
 ---
 
@@ -81,24 +58,6 @@ database/
 **Secure by default** — `JwtAuthGuard` is a global `APP_GUARD`. Routes explicitly opt out with `@Public()` rather than opting in.
 
 **Fire-and-forget audit** — `AuditService.log()` is async and internally swallows errors so audit write failures never surface to consumers.
-
----
-
-## API overview
-
-Base path: `/api` — full docs at `/api/docs`
-
-| Tag           | Key endpoints                                                      |
-|---------------|--------------------------------------------------------------------|
-| Auth          | POST /auth/register, /auth/login, /auth/refresh, /auth/logout      |
-| Users         | GET /users/me, GET /users (Admin), PATCH /users/:id/deactivate     |
-| Accounts      | POST /accounts, GET /accounts, PATCH /accounts/:id/freeze          |
-| Transactions  | POST /transactions/transfer, /deposit, /withdraw; GET history      |
-| Wallets       | GET /wallets/account/:id/limits, PATCH upgrade (Admin)             |
-| KYC           | POST /kyc/submit, GET /kyc/me, PATCH /kyc/:id/review (Admin)       |
-| Notifications | GET /notifications, PATCH read/read-all, GET unread-count          |
-| Admin         | GET /admin/stats, /admin/user-growth                               |
-| Health        | GET /health, /health/ping                                          |
 
 ---
 
