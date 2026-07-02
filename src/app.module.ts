@@ -63,23 +63,29 @@ const ENTITIES = [
 
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (cs: ConfigService) => ({
-        type: 'postgres',
-        host: cs.get('database.host'),
-        port: cs.get('database.port'),
-        username: cs.get('database.username'),
-        password: cs.get('database.password'),
-        database: cs.get('database.name'),
-        entities: ENTITIES,
-        synchronize: cs.get('nodeEnv') === 'development',
-        migrationsRun: cs.get('nodeEnv') !== 'development',
-        migrations: ['dist/database/migrations/*.js'],
-        logging: cs.get('nodeEnv') === 'development',
-        ssl:
-          cs.get('nodeEnv') === 'production'
-            ? { rejectUnauthorized: false }
-            : false,
-      }),
+      useFactory: (cs: ConfigService) => {
+        const databaseUrl = cs.get<string>('database.url');
+        const useSsl = cs.get<boolean>('database.ssl') ?? false;
+
+        return {
+          type: 'postgres' as const,
+          ...(databaseUrl
+            ? { url: databaseUrl }
+            : {
+                host: cs.get<string>('database.host'),
+                port: cs.get<number>('database.port'),
+                username: cs.get<string>('database.username'),
+                password: cs.get<string>('database.password'),
+                database: cs.get<string>('database.name'),
+              }),
+          entities: ENTITIES,
+          synchronize: cs.get('nodeEnv') === 'development',
+          migrationsRun: cs.get('nodeEnv') !== 'development',
+          migrations: ['dist/database/migrations/*.js'],
+          logging: cs.get('nodeEnv') === 'development',
+          ssl: useSsl ? { rejectUnauthorized: false } : false,
+        };
+      },
       inject: [ConfigService],
     }),
 
