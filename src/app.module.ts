@@ -84,6 +84,9 @@ const ENTITIES = [
           migrations: ['dist/database/migrations/*.js'],
           logging: cs.get('nodeEnv') === 'development',
           ssl: useSsl ? { rejectUnauthorized: false } : false,
+          extra: {
+            max: 20,
+          },
         };
       },
       inject: [ConfigService],
